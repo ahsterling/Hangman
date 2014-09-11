@@ -1,23 +1,25 @@
 class Hangman
   require 'colorize'
-  attr_accessor :words, :current_word, :letters_guessed, :word_guessed, :guess, :counter
+  attr_accessor :words, :current_word, :letters_guessed, :word_guessed, :guess, :counter, :display, :all_words
 
   def initialize
-    @all_words = []
-    @current_word = []
+    @current_word = pick_word_rand.chars
     @letters_guessed = []
-    @word_guessed = nil
+    @word_guessed = word_guessed
     @counter = 0
-    add_words
+    @display = Display.new
   end
 
-  def add_words
-    @all_words.push("apple", "bacon", "pineapple", "melon", "cheese", "burrito", "avocado")
+  def all_words
+    ["apple", "bacon", "pineapple", "melon", "cheese", "burrito", "avocado"]
   end
 
   def pick_word_rand
-    @current_word = @all_words[rand(0..@all_words.count-1)].chars
-    @word_guessed = Array.new(@current_word.length, "_ ")
+    all_words.sample
+  end
+
+  def word_guessed
+    Array.new(@current_word.length, "_ ")
   end
 
   def array_to_word(array)
@@ -86,30 +88,17 @@ class Hangman
 
     if counter == 0
 
-      puts grid[:a]
-      puts grid[:b]
-      puts grid[:c]
-      puts grid[:d]
-      puts grid[:e]
-      puts grid[:f]
-      puts grid[:g]
-      puts grid[:h]
+      grid.each_value {|value| puts value}
+
     end
 
     if @counter == 1
-      grid[:c][9] = "("
-      grid[:c][10] = "_"
-      grid[:c][11] = ")"
+      grid[:c][9] = "(".colorize(:red)
+      grid[:c][10] = "_".colorize(:red)
+      grid[:c][11] = ")".colorize(:red)
 
+      grid.each_value {|value| puts value}
 
-      puts grid[:a]
-      puts grid[:b]
-      puts grid[:c]
-      puts grid[:d]
-      puts grid[:e]
-      puts grid[:f]
-      puts grid[:g]
-      puts grid[:h]
 
     end
 
@@ -117,14 +106,9 @@ class Hangman
       grid[:d][10] = "|"
       grid[:e][10] = "|"
 
-      puts grid[:a]
-      puts grid[:b]
-      puts grid[:c]
-      puts grid[:d]
-      puts grid[:e]
-      puts grid[:f]
-      puts grid[:g]
-      puts grid[:h]
+
+      grid.each_value {|value| puts value}
+
     end
 
 #     puts """
@@ -139,6 +123,17 @@ class Hangman
 #  ____|______
 # """
   end
+
+  def game_over?
+    if @word_guessed == @current_word
+      puts "Yay, you guessed the word!"
+      exit
+    elsif @counter >= 6
+      puts "Sorry, you didn't figure out the word in time!  Game over."
+      exit
+    end
+  end
+
 
   def win?
     if @word_guessed == @current_word
@@ -161,10 +156,17 @@ class Hangman
 end
 
 class Display
-  attr_accessor :grid
+  attr_accessor :grid, :counter
 
   def initialize
     blank_screen
+    @head = " "
+    @body = " "
+    @left_arm = " "
+    @right_arm = " "
+    @left_leg = " "
+    @right_leg = " "
+    @counter = 0
   end
 
   def blank_screen
@@ -180,31 +182,37 @@ class Display
     }
   end
 
-  def draw
-
-    @grid.each
-
-  end
-
-  def add_body_part(counter)
+  def draw(counter)
 
     if counter == 0
-      puts @grid
 
     elsif counter == 1
-      @grid[:c][9] = "("
-      @grid[:c][10] = "_"
-      @grid[:c][11] = ")"
-
-      puts @grid
+      @grid[:c][10] = "0"
 
     elsif counter == 2
       @grid[:d][10] = "|"
       @grid[:e][10] = "|"
 
-      puts @grid
+    elsif counter == 3
+      @grid[:d][9] = "\\"
+
+    elsif counter == 4
+      @grid[:d][11] = "/"
+
+    elsif counter == 5
+      @grid[:f][9] = "/"
+
+    elsif counter == 6
+      @grid[:f][11] = "\\"
 
     end
+
+    return @grid.each_value { |value| puts value }
+  end
+
+  def add_body_part(counter)
+
+
 
   end
 
@@ -213,27 +221,24 @@ end
 def run
 
   h = Hangman.new
-  d = display
-  puts "Hello, welcome to my hangman game!  Here is your word:"
-  puts
-  h.pick_word_rand
+  puts "Hello, welcome to my hangman game!"
+  h.display.draw(0)
+  puts "Here is your word: "
   h.draw_current_word
-  h.draw
   prompt = "What letter would you like to guess?"
   puts prompt
   input = gets.chomp
-
   while input != "exit"
     h.draw_current_word(input)
-    h.draw
-    h.win?
-    puts h.counter
+    h.display.draw(h.counter)
+    h.game_over?
     puts prompt
+    puts
     puts "You've already guessed these letters: #{h.letters_guessed.join(" ")}"
     input = gets.chomp
   end
 
-  exit
+
 
 
 end
