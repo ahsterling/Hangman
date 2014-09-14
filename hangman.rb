@@ -11,7 +11,6 @@ class Hangman
   end
 
   def all_words
-    #["cat"]
     ["apple", "bacon", "pineapple", "melon", "cheese", "burrito", "avocado"]
   end
 
@@ -20,7 +19,7 @@ class Hangman
   end
 
   def empty_characters
-    Array.new(@current_word.count, "_ ".colorize(:blue))
+    Array.new(@current_word.count, "_ ")
   end
 
   def display_guess
@@ -38,7 +37,7 @@ class Hangman
     if check(guess)
       @current_word.each.with_index do |letter, index|
         if letter == guess
-          @word_guessed[index] = letter.colorize(:magenta)
+          @word_guessed[index] = letter
         end
       end
     end
@@ -69,7 +68,7 @@ class Hangman
       puts "Yay, you guessed the word!"
       puts
       exit
-    elsif @counter >= 6
+    elsif @counter >= 7
       puts
       puts "Sorry, you didn't figure out the word in time!  Game over."
       puts
@@ -84,13 +83,8 @@ class Display
   attr_accessor :grid
 
   def initialize
+    @grid = {}
     blank_screen
-    @head = " "
-    @body = " "
-    @left_arm = " "
-    @right_arm = " "
-    @left_leg = " "
-    @right_leg = " "
   end
 
 
@@ -109,34 +103,38 @@ class Display
     }
   end
 
-
-
-  def draw(counter)
-
+  def update_screen(counter)
     if counter == 0
 
     elsif counter == 1
-      @grid[:c][10] = "O"#.colorize(:red)
+      @grid[:c][10] = "O".colorize(:red)
 
     elsif counter == 2
-      @grid[:d][10] = "|"
-      @grid[:e][10] = "|"#.colorize(:blue)
+      @grid[:d][11] = "/"
 
     elsif counter == 3
 
-      @grid[:d][11] = "/"
+      @grid[:d][10] = "|"
 
     elsif counter == 4
       @grid[:d][9] = "\\"
 
     elsif counter == 5
-      @grid[:f][11] = "\\"
+
+      @grid[:e][10] = "|".colorize(:green)
+
 
     elsif counter == 6
+      @grid[:f][11] = "\\".colorize(:yellow)
+
+    elsif counter == 7
 
       @grid[:f][9] = "/"
 
     end
+  end
+
+  def draw
 
     @grid.each_value { |value| puts value }
 
@@ -168,7 +166,7 @@ def run
 
   h = Hangman.new
   puts"\e[H\e[2J"
-  h.display.draw(0)
+  h.display.draw
   puts h.display_guess
   prompt = "What letter would you like to guess?"
   puts
@@ -190,8 +188,14 @@ def run
 
     h.draw_current_word(input)
 
-    h.display.draw(h.counter)
+    if !h.check(input)
+      h.display.update_screen(h.counter)
+      h.display.draw
+    end
+
+    #h.display.draw
     puts h.display_guess
+
 
     h.game_over?
     puts
