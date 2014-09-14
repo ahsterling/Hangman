@@ -20,7 +20,7 @@ class Hangman
   end
 
   def empty_characters
-    Array.new(@current_word.count, "_ ")
+    Array.new(@current_word.count, "_ ".colorize(:blue))
   end
 
   def display_guess
@@ -38,7 +38,7 @@ class Hangman
     if check(guess)
       @current_word.each.with_index do |letter, index|
         if letter == guess
-          @word_guessed[index] = letter
+          @word_guessed[index] = letter.colorize(:magenta)
         end
       end
     end
@@ -116,11 +116,11 @@ class Display
     if counter == 0
 
     elsif counter == 1
-      @grid[:c][10] = "O".colorize(:red)
+      @grid[:c][10] = "O"#.colorize(:red)
 
     elsif counter == 2
       @grid[:d][10] = "|"
-      @grid[:e][10] = "|".colorize(:blue)
+      @grid[:e][10] = "|"#.colorize(:blue)
 
     elsif counter == 3
 
