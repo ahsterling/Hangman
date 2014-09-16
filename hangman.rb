@@ -107,7 +107,7 @@ class Display
     if counter == 0
 
     elsif counter == 1
-      @grid[:c][10] = "O".colorize(:red)
+      @grid[:c][10] = "O"
 
     elsif counter == 2
       @grid[:d][11] = "/"
@@ -121,11 +121,11 @@ class Display
 
     elsif counter == 5
 
-      @grid[:e][10] = "|".colorize(:green)
+      @grid[:e][10] = "|"
 
 
     elsif counter == 6
-      @grid[:f][11] = "\\".colorize(:yellow)
+      @grid[:f][11] = "\\"
 
     elsif counter == 7
 
